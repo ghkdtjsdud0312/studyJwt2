@@ -15,7 +15,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 아이디 값이 겹치지 않고 자동으로 잘 생성됨
     private Long id;
 
-    // 사용자 이름
+    // 사용자 아이디
     private String userName;
 
     // 비밀번호
