@@ -16,15 +16,12 @@ public class UserEntity {
     private Long id;
 
     // 사용자 이름
-    @Column
     private String userName;
 
     // 비밀번호
-    @Column
     private String password;
 
     // 사용자나 관리자 권한
-    @Column
     private String role;
 
 }
