@@ -46,7 +46,7 @@ public class SecurityConfig {
         http
                 .csrf().disable();
 
-        //From 로그인 방식 disable
+        //Form 로그인 방식 disable
         http
                 .formLogin().disable();
 
