@@ -1,5 +1,6 @@
 package jwtLogin.jwt_login.config;
 
+import jwtLogin.jwt_login.jwt.JWTUtil;
 import jwtLogin.jwt_login.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +20,13 @@ public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    // JWTUtil 주입
+    private final JWTUtil jwtUtil;
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
 
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
     }
 
     @Bean
@@ -64,7 +69,7 @@ public class SecurityConfig {
         // filter를 대체해서 등록 할 것이기 때문에 그 자리에 등록 하기 위해서 addFilterAt라는 메소드 사용
         // 위에서 authenticationManager 주입 받은 후 호출해서 가로 안에 넣어 준다.
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         //세션 설정(jwt에서 중요한 방식)
         // session을 stateless 상태로 설정 해줘야 함

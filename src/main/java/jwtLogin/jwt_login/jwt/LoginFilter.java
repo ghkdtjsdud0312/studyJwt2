@@ -12,13 +12,17 @@ import javax.servlet.http.HttpServletResponse;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    // 주입 받기
+    // AuthenticationManager 주입 받기
     private final AuthenticationManager authenticationManager;
 
+    // JWTUtil 주입 받기
+    private final JWTUtil jwtUtil;
+
     // 생성자 방식으로 받기
-    public LoginFilter(AuthenticationManager authenticationManager) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
 
         this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
     }
 
     // attemptAuthentication 메서드를 @Override 해줘야 한다.
