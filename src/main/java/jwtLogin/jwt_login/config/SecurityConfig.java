@@ -1,5 +1,6 @@
 package jwtLogin.jwt_login.config;
 
+import jwtLogin.jwt_login.jwt.JWTFilter;
 import jwtLogin.jwt_login.jwt.JWTUtil;
 import jwtLogin.jwt_login.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +66,11 @@ public class SecurityConfig {
                 .antMatchers("/login", "/", "/join").permitAll() // 모든 권한 허용
                 .antMatchers("/admin").hasRole("ADMIN") // 어드민이라는 권한을 가진 사용자만 접근 가능
                 .anyRequest().authenticated(); // 그 외 나머지 요청에 대해서는 로그인한 사용자만 접근 가능
+
+        // JWTFilter 등록
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+
 
         // filter를 대체해서 등록 할 것이기 때문에 그 자리에 등록 하기 위해서 addFilterAt라는 메소드 사용
         // 위에서 authenticationManager 주입 받은 후 호출해서 가로 안에 넣어 준다.
