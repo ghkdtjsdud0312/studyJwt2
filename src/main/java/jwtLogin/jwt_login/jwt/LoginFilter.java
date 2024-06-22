@@ -1,14 +1,18 @@
 package jwtLogin.jwt_login.jwt;
 
+import jwtLogin.jwt_login.dto.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -50,9 +54,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 성공시 실행 하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        // 성공 하면 success!
-        System.out.println("success");
 
+        // 유저 객체를 알아 내기(특정한 유저를 알아 볼 수 있다.)
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // customUserDetails에서 유저 네임을 뽑아낸다.
+        String username = customUserDetails.getUsername();
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+
+        // role 값 구현
+        String role = auth.getAuthority();
+
+        // 토큰 만들어 토큰 받아옴
+        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+
+        // 헤더 부분에 담아 응답 해준다.
+        response.addHeader("Authorization", "Bearer " + token);
     }
 
     //로그인 실패시 실행 하는 메소드
