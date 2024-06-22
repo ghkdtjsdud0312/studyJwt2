@@ -13,6 +13,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 
 @Configuration // security를 위한 것
 @EnableWebSecurity
@@ -45,6 +50,32 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http
+                .cors((corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+
+                        CorsConfiguration configuration = new CorsConfiguration();
+
+                        // 허용할 앞단의 프론트엔드 쪽에서 서버가 데이터를 보낼 것이라서 3000번 포트를 허용 한다.
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        // 허용할 메소드는 get,post 옵션 헤더와 같은 모든 메소드를 다 허용한다.
+                        configuration.setAllowedMethods(Collections.singletonList("*"));
+                        // 앞단에 프론트 서버 쪽에서 Credentials 설정을 하면 true로 바꿔줘야 한다.
+                        configuration.setAllowCredentials(true);
+                        // 나머지 허용할 헤더
+                        configuration.setAllowedHeaders(Collections.singletonList("*"));
+                        // 허용을 할 최대 시간
+                        configuration.setMaxAge(3600L);
+
+                        // 프론트 단으로 사용자 클라이언트 단으로 헤더를 보내줄 때 Authorization에 jwt를 넣어 보내줄 것이기 때문에 Authorization 헤더도 허용 시켜줘야 한다.
+                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+
+                        return configuration;
+                    }
+                })));
 
         //csrf disable
         // 세션 방식에서는 세션이 계속 항상 고정되기 때문에 csrf 공격이 필수적으로 방어를 해줘야 한다.
@@ -82,6 +113,7 @@ public class SecurityConfig {
         http
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 
         return http.build();
     }
